@@ -1,0 +1,59 @@
+on *:TEXT:!buyticket &:#:{
+  if (%open == 1) {
+    if ($2 > 10) {
+      msg $chan $nick $+ , you cannot buy that many tickets!
+    }
+    if ($2 < 11) {
+      var %i = 0
+      var %count = $2
+      var %topic = $+(#,.,$nick)
+      var %user = $readini(Points.ini,%topic,Points)
+      var %final = 10 * %count
+      var %remove = %user - %final
+      if (%remove > 0) {
+        writeini -n Points.ini %topic Points %remove
+        while (%i < %count) {
+          write Raffle.txt $nick
+          %i = %i + 1
+        }
+        msg $chan $nick $+ , has bought %count tickets spending %final points!
+      }
+      if (%remove < 0) {
+        msg $chan Sorry $nick but you don't have enough points to buy %count tickets!
+      }
+    }
+  }
+}
+
+on *:TEXT:*:#:{
+  if ($nick isop #) {
+    if ($1 == !raffle) {
+      if ($2 == open) {
+        msg $chan /me [RAFFLE STARTED]
+        set %open 1
+        write -c Raffle.txt
+        echo -a Raffle Started
+      }
+      if ($2 == close) {
+        msg $chan /me [RAFFLE CLOSED]
+        set %open 0
+        write -c Raffle.txt
+        echo -a Raffle Closed
+      }
+    }
+    if ($1 == !draw) {
+      if (%open == 1) {
+        var %user = $read(Raffle.txt,n)
+        write -c Raffle.txt
+        set %open 0
+        msg $chan /me And the winner is... %user $+ !!! Well Done!
+        echo -a Raffle Closed
+      }
+    }
+  }
+  if ($1 == !tickets) {
+    if (%open == 1) {
+      msg $chan There are currently $lines(Raffle.txt) tickets entered into the raffle!
+    }
+  }
+}
