@@ -1,0 +1,13 @@
+on *:TEXT:!whalecum*:#: {
+  if ($nick isop #) {  
+    msg $chan Insert message here NERD!!!
+  }
+}
+
+on *:TEXT:*:#: {
+  INC %msgCounter
+  if (%msgCounter > 20) { 
+    msg $chan Insert message here NERD!!! 
+    set %msgCounter 1
+  }
+}
